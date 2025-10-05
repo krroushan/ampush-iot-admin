@@ -1,0 +1,308 @@
+{
+	"info": {
+		"_postman_id": "customer-api-collection",
+		"name": "Customer API Collection",
+		"description": "Complete API collection for Customer Authentication and Profile Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				}
+			}
+		},
+		{
+			"name": "Customer Registration",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone_number\": \"+91 9876543210\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"address_line_1\": \"123 Main Street\",\n    \"address_line_2\": \"Apt 4B\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"postal_code\": \"400001\",\n    \"country\": \"India\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/customer/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"register"
+					]
+				}
+			}
+		},
+		{
+			"name": "Customer Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/customer/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"login"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const response = pm.response.json();",
+							"    if (response.success && response.data.token) {",
+							"        pm.environment.set('auth_token', response.data.token);",
+							"    }",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Profile",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/customer/profile",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"profile"
+					]
+				}
+			}
+		},
+		{
+			"name": "Update Profile",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"John Smith\",\n    \"phone_number\": \"+91 9876543211\",\n    \"address_line_1\": \"456 New Street\",\n    \"city\": \"Delhi\",\n    \"state\": \"Delhi\",\n    \"postal_code\": \"110001\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/customer/profile",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"profile"
+					]
+				}
+			}
+		},
+		{
+			"name": "Change Password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"current_password\": \"password123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/customer/change-password",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"change-password"
+					]
+				}
+			}
+		},
+		{
+			"name": "Forgot Password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"john@example.com\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/customer/forgot-password",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"forgot-password"
+					]
+				}
+			}
+		},
+		{
+			"name": "Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"token\": \"reset_token_from_email\",\n    \"email\": \"john@example.com\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/customer/reset-password",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"reset-password"
+					]
+				}
+			}
+		},
+		{
+			"name": "Refresh Token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/customer/refresh-token",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"refresh-token"
+					]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const response = pm.response.json();",
+							"    if (response.success && response.data.token) {",
+							"        pm.environment.set('auth_token', response.data.token);",
+							"    }",
+							"}"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/customer/logout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"customer",
+						"logout"
+					]
+				}
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"description": "Base URL for the API"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"description": "Authentication token for protected endpoints"
+		}
+	]
+}
