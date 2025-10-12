@@ -43,6 +43,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Motor Logs Management Routes
     Route::resource('motor-logs', \App\Http\Controllers\MotorLogsController::class);
     Route::post('motor-logs/bulk-delete', [\App\Http\Controllers\MotorLogsController::class, 'bulkDelete'])->name('motor-logs.bulk-delete');
+
+    // Notification Routes
+    Route::get('notifications', [\App\Http\Controllers\Admin\NotificationWebController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/send', [\App\Http\Controllers\Admin\NotificationWebController::class, 'send'])->name('notifications.send');
+    Route::post('notifications/send', [\App\Http\Controllers\Admin\NotificationWebController::class, 'store'])->name('notifications.store');
 });
 
 require __DIR__.'/auth.php';

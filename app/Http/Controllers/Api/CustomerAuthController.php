@@ -63,6 +63,13 @@ class CustomerAuthController extends Controller
             // Create token
             $token = $customer->createToken('CustomerAuthToken')->plainTextToken;
 
+            // Get customer's assigned devices
+            $devices = \App\Models\Device::where('user_id', $customer->id)
+                ->where('is_active', true)
+                ->select('id', 'device_name', 'sms_number', 'description', 'last_activity_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Login successful',
@@ -81,6 +88,7 @@ class CustomerAuthController extends Controller
                         'profile_photo_url' => $customer->profile_photo_url,
                         'created_at' => $customer->created_at,
                     ],
+                    'devices' => $devices,
                     'token' => $token,
                     'token_type' => 'Bearer'
                 ]
@@ -126,6 +134,13 @@ class CustomerAuthController extends Controller
         try {
             $customer = $request->user();
 
+            // Get customer's assigned devices
+            $devices = \App\Models\Device::where('user_id', $customer->id)
+                ->where('is_active', true)
+                ->select('id', 'device_name', 'sms_number', 'description', 'last_activity_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -143,7 +158,8 @@ class CustomerAuthController extends Controller
                         'profile_photo_url' => $customer->profile_photo_url,
                         'created_at' => $customer->created_at,
                         'updated_at' => $customer->updated_at,
-                    ]
+                    ],
+                    'devices' => $devices
                 ]
             ], 200);
 
@@ -274,6 +290,53 @@ class CustomerAuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Token refresh failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update FCM Token
+     */
+    public function updateFCMToken(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'fcm_token' => 'required|string|max:255'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            $user->update(['fcm_token' => $request->fcm_token]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FCM token updated successfully',
+                'data' => [
+                    'user_id' => $user->id,
+                    'fcm_token' => $user->fcm_token
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update FCM token',
                 'error' => $e->getMessage()
             ], 500);
         }

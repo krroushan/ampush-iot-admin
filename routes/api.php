@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MotorLogController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Admin\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,9 @@ Route::middleware(['auth:sanctum', 'customer'])->prefix('customer')->group(funct
     
     // My devices route
     Route::get('/devices', [DeviceController::class, 'myDevices']);
+    
+    // FCM token update
+    Route::post('/fcm-token', [CustomerAuthController::class, 'updateFCMToken']);
 });
 
 // IoT Motor Logs API Routes (Public - for mobile app sync)
@@ -70,6 +74,14 @@ Route::prefix('devices')->group(function () {
     Route::post('/', [DeviceController::class, 'store']); // Register/update device
     Route::post('/{smsNumber}/activity', [DeviceController::class, 'updateActivity']); // Update last activity
     Route::post('/by-phone', [DeviceController::class, 'getByPhone']); // Get device by phone number
+});
+
+// Admin Notification API Routes (Protected - for admin panel)
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    Route::post('/notifications/send-all', [NotificationController::class, 'sendToAll']); // Send to all customers
+    Route::post('/notifications/send-customer/{customerId}', [NotificationController::class, 'sendToCustomer']); // Send to specific customer
+    Route::post('/notifications/send-by-phone', [NotificationController::class, 'sendToCustomersByPhone']); // Send by phone numbers
+    Route::get('/notifications/customers', [NotificationController::class, 'getCustomersWithTokens']); // Get customers with FCM tokens
 });
 
 // Health check route
