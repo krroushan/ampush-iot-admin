@@ -43,7 +43,12 @@ class MotorLogController extends Controller
             // Store timestamp as string (no conversion needed)
             $timestamp = (string)$request->timestamp;
             
+            // Find device by phone number to get device_id and user_id
+            $device = \App\Models\Device::where('sms_number', $request->phoneNumber)->first();
+            
             $log = MotorLog::create([
+                'device_id' => $device ? $device->id : null,
+                'user_id' => $device ? $device->user_id : null,
                 'timestamp' => $timestamp,
                 'motor_status' => $request->motorStatus,
                 'voltage' => $request->voltage,
@@ -113,7 +118,12 @@ class MotorLogController extends Controller
                     // Store timestamp as string (no conversion needed)
                     $timestamp = (string)$logData['timestamp'];
                     
+                    // Find device by phone number to get device_id and user_id
+                    $device = \App\Models\Device::where('sms_number', $logData['phoneNumber'])->first();
+                    
                     $log = MotorLog::create([
+                        'device_id' => $device ? $device->id : null,
+                        'user_id' => $device ? $device->user_id : null,
                         'timestamp' => $timestamp,
                         'motor_status' => $logData['motorStatus'],
                         'voltage' => $logData['voltage'] ?? null,
@@ -201,13 +211,18 @@ class MotorLogController extends Controller
                 $query->byStatus($request->motorStatus);
             }
 
+            if ($request->has('deviceId')) {
+                $query->byDevice($request->deviceId);
+            }
+
             // Pagination
             $page = $request->get('page', 0);
             $size = $request->get('size', 100);
             $offset = $page * $size;
 
             $totalCount = $query->count();
-            $logs = $query->orderBy('timestamp', 'desc')
+            $logs = $query->with(['device'])
+                         ->orderBy('timestamp', 'desc')
                          ->offset($offset)
                          ->limit($size)
                          ->get();
@@ -227,6 +242,7 @@ class MotorLogController extends Controller
                         'clock' => $log->clock,
                         'command' => $log->command,
                         'phoneNumber' => $log->phone_number,
+                        'deviceName' => $log->device ? $log->device->device_name : null,
                         'isSynced' => $log->is_synced,
                         'createdAt' => $log->created_at->toISOString(),
                         'updatedAt' => $log->updated_at->toISOString()
@@ -254,7 +270,7 @@ class MotorLogController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $log = MotorLog::findOrFail($id);
+            $log = MotorLog::with(['device'])->findOrFail($id);
 
             return response()->json([
                 'id' => $log->id,
@@ -267,6 +283,7 @@ class MotorLogController extends Controller
                 'clock' => $log->clock,
                 'command' => $log->command,
                 'phoneNumber' => $log->phone_number,
+                'deviceName' => $log->device ? $log->device->device_name : null,
                 'isSynced' => $log->is_synced,
                 'createdAt' => $log->created_at->toISOString(),
                 'updatedAt' => $log->updated_at->toISOString()

@@ -94,6 +94,38 @@ Route::get('/health', function () {
     ]);
 });
 
+// Phone number validation route
+Route::get('/validate-phone', function (Request $request) {
+    $phoneNumber = $request->get('phone');
+    
+    if (!$phoneNumber) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Phone number is required',
+            'isRegistered' => false
+        ], 400);
+    }
+    
+    // Check if phone number exists in users table (customers)
+    $user = \App\Models\User::where('phone_number', $phoneNumber)
+                           ->where('role', 'customer')
+                           ->first();
+    
+    if ($user) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Phone number is registered',
+            'isRegistered' => true
+        ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'This number is not registered with our motor control system. Please choose a registered number.',
+            'isRegistered' => false
+        ], 404);
+    }
+});
+
 // Fallback route
 Route::fallback(function () {
     return response()->json([

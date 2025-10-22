@@ -47,19 +47,26 @@ class MotorLogsController extends Controller
             $query->where('is_synced', $request->is_synced === '1');
         }
 
-        // Filter by customer (if phone number matches customer phone)
+        // Filter by customer using user_id relationship
         if ($request->filled('customer_id')) {
-            $customer = User::find($request->customer_id);
-            if ($customer && $customer->phone_number) {
-                $query->where('phone_number', $customer->phone_number);
-            }
+            $query->where('user_id', $request->customer_id);
+        }
+
+        // Filter by phone number (direct phone number search)
+        if ($request->filled('phone_number')) {
+            $query->where('phone_number', $request->phone_number);
+        }
+
+        // Filter by device
+        if ($request->filled('device_id')) {
+            $query->where('device_id', $request->device_id);
         }
 
         // Get statistics
         $stats = $this->getStats($query->clone());
 
         // Paginate results
-        $motorLogs = $query->with('customer')
+        $motorLogs = $query->with(['user', 'device'])
             ->orderBy('timestamp', 'desc')
             ->paginate(20)
             ->withQueryString();
@@ -71,15 +78,19 @@ class MotorLogsController extends Controller
             ->pluck('phone_number')
             ->toArray();
 
-        return view('motor-logs.index', compact('motorLogs', 'phoneNumbers', 'stats'));
+        // Get devices for filter dropdown
+        $devices = \App\Models\Device::orderBy('device_name')->get();
+
+        return view('motor-logs.index', compact('motorLogs', 'phoneNumbers', 'devices', 'stats'));
     }
 
     public function show(MotorLog $motorLog)
     {
-        // Try to find customer by phone number
-        $customer = User::where('phone_number', $motorLog->phone_number)
-            ->where('role', 'customer')
-            ->first();
+        // Load the motor log with its user relationship
+        $motorLog->load('user');
+        
+        // Get customer from the user relationship
+        $customer = $motorLog->user;
 
         return view('motor-logs.show', compact('motorLog', 'customer'));
     }

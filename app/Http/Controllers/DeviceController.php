@@ -4,11 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\User;
+use App\Models\Notification;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller
 {
+    private $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
     /**
      * Display a listing of devices
      */
@@ -98,7 +107,12 @@ class DeviceController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
 
-        Device::create($validated);
+        $device = Device::create($validated);
+
+        // Send notification if device is created with a customer assigned
+        if ($device->user_id) {
+            $this->sendDeviceAssignmentNotification($device, $device->user_id, true);
+        }
 
         return redirect()->route('devices.index')
             ->with('success', 'Device created successfully!');
@@ -152,7 +166,17 @@ class DeviceController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
 
+        // Check if device is being assigned to a customer
+        $oldUserId = $device->user_id;
+        $newUserId = $validated['user_id'];
+        $isBeingAssigned = $oldUserId != $newUserId && !is_null($newUserId);
+
         $device->update($validated);
+
+        // Send notification if device is being assigned to a customer
+        if ($isBeingAssigned) {
+            $this->sendDeviceAssignmentNotification($device, $newUserId);
+        }
 
         return redirect()->route('devices.index')
             ->with('success', 'Device updated successfully!');
@@ -201,5 +225,88 @@ class DeviceController extends Controller
         $device->update(['user_id' => null]);
 
         return back()->with('success', 'Device unassigned successfully!');
+    }
+
+    /**
+     * Send device assignment notification to customer
+     */
+    private function sendDeviceAssignmentNotification(Device $device, $userId, $isNewDevice = false)
+    {
+        try {
+            $customer = User::find($userId);
+            
+            if (!$customer || !$customer->fcm_token) {
+                Log::info('Customer not found or no FCM token for device assignment notification', [
+                    'device_id' => $device->id,
+                    'user_id' => $userId,
+                    'is_new_device' => $isNewDevice
+                ]);
+                return;
+            }
+
+            // Determine notification content based on whether it's a new device or reassignment
+            $title = $isNewDevice ? 'New Device Assigned' : 'Device Assigned';
+            $body = $isNewDevice 
+                ? "New device '{$device->device_name}' has been created and assigned to you."
+                : "Device '{$device->device_name}' has been assigned to you.";
+            $action = $isNewDevice ? 'device_created' : 'device_assigned';
+
+            // Create notification record
+            $notification = Notification::create([
+                'user_id' => $userId,
+                'title' => $title,
+                'body' => $body,
+                'type' => 'device_assignment',
+                'data' => json_encode([
+                    'device_id' => $device->id,
+                    'device_name' => $device->device_name,
+                    'sms_number' => $device->sms_number,
+                    'action' => $action,
+                    'is_new_device' => $isNewDevice
+                ]),
+                'sent' => false,
+                'sent_count' => 0,
+                'failure_count' => 0,
+            ]);
+
+            // Send push notification
+            $this->firebaseService->sendNotification(
+                $customer->fcm_token,
+                $title,
+                $body,
+                [
+                    'device_id' => (string)$device->id,
+                    'device_name' => $device->device_name,
+                    'sms_number' => $device->sms_number,
+                    'action' => $action,
+                    'is_new_device' => $isNewDevice
+                ]
+            );
+
+            // Update notification as sent
+            $notification->update([
+                'sent' => true,
+                'sent_count' => 1,
+                'sent_at' => now(),
+            ]);
+
+            Log::info('Device assignment notification sent successfully', [
+                'device_id' => $device->id,
+                'device_name' => $device->device_name,
+                'customer_id' => $userId,
+                'customer_name' => $customer->name,
+                'notification_id' => $notification->id,
+                'is_new_device' => $isNewDevice
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send device assignment notification', [
+                'device_id' => $device->id,
+                'user_id' => $userId,
+                'is_new_device' => $isNewDevice,
+                'error' => $e->getMessage(),
+                'exception' => $e
+            ]);
+        }
     }
 }

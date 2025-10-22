@@ -3,12 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Device;
+use App\Models\Notification;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
+    private $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
     /**
      * Display a listing of customers
      */
@@ -233,13 +243,92 @@ class CustomerController extends Controller
             'device_id' => 'required|exists:devices,id'
         ]);
 
-        $device = \App\Models\Device::findOrFail($request->device_id);
+        $device = Device::findOrFail($request->device_id);
+        
+        // Check if device is being assigned (not just reassigned)
+        $oldUserId = $device->user_id;
+        $isBeingAssigned = $oldUserId != $customer->id;
         
         // Assign device to customer
         $device->update(['user_id' => $customer->id]);
 
+        // Send notification if device is being assigned to this customer
+        if ($isBeingAssigned) {
+            $this->sendDeviceAssignmentNotification($device, $customer);
+        }
+
         return redirect()->route('customers.show', $customer)
             ->with('success', 'Device assigned successfully.');
+    }
+
+    /**
+     * Send device assignment notification to customer
+     */
+    private function sendDeviceAssignmentNotification(Device $device, User $customer)
+    {
+        try {
+            if (!$customer->fcm_token) {
+                Log::info('No FCM token for device assignment notification', [
+                    'device_id' => $device->id,
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->name
+                ]);
+                return;
+            }
+
+            // Create notification record
+            $notification = Notification::create([
+                'user_id' => $customer->id,
+                'title' => 'Device Assigned',
+                'body' => "Device '{$device->device_name}' has been assigned to you.",
+                'type' => 'device_assignment',
+                'data' => json_encode([
+                    'device_id' => $device->id,
+                    'device_name' => $device->device_name,
+                    'sms_number' => $device->sms_number,
+                    'action' => 'device_assigned'
+                ]),
+                'sent' => false,
+                'sent_count' => 0,
+                'failure_count' => 0,
+            ]);
+
+            // Send push notification
+            $this->firebaseService->sendNotification(
+                $customer->fcm_token,
+                'Device Assigned',
+                "Device '{$device->device_name}' has been assigned to you.",
+                [
+                    'device_id' => (string)$device->id,
+                    'device_name' => $device->device_name,
+                    'sms_number' => $device->sms_number,
+                    'action' => 'device_assigned'
+                ]
+            );
+
+            // Update notification as sent
+            $notification->update([
+                'sent' => true,
+                'sent_count' => 1,
+                'sent_at' => now(),
+            ]);
+
+            Log::info('Device assignment notification sent successfully', [
+                'device_id' => $device->id,
+                'device_name' => $device->device_name,
+                'customer_id' => $customer->id,
+                'customer_name' => $customer->name,
+                'notification_id' => $notification->id
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to send device assignment notification', [
+                'device_id' => $device->id,
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage(),
+                'exception' => $e
+            ]);
+        }
     }
 
 }

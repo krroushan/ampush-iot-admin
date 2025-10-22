@@ -42,9 +42,17 @@ class Device extends Model
     }
 
     /**
-     * Get motor logs for this device
+     * Get motor logs for this device (new relationship using device_id)
      */
     public function motorLogs(): HasMany
+    {
+        return $this->hasMany(MotorLog::class);
+    }
+
+    /**
+     * Get motor logs for this device (legacy relationship using phone_number)
+     */
+    public function motorLogsByPhone(): HasMany
     {
         return $this->hasMany(MotorLog::class, 'phone_number', 'sms_number');
     }

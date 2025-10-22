@@ -8,6 +8,8 @@ use Carbon\Carbon;
 class MotorLog extends Model
 {
     protected $fillable = [
+        'device_id',
+        'user_id',
         'timestamp',
         'motor_status',
         'voltage',
@@ -73,7 +75,39 @@ class MotorLog extends Model
     }
 
     /**
-     * Get the customer associated with this motor log
+     * Scope for filtering by device
+     */
+    public function scopeByDevice($query, $deviceId)
+    {
+        return $query->where('device_id', $deviceId);
+    }
+
+    /**
+     * Scope for filtering by user
+     */
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Get the device associated with this motor log
+     */
+    public function device()
+    {
+        return $this->belongsTo(Device::class);
+    }
+
+    /**
+     * Get the user/customer associated with this motor log
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the customer associated with this motor log (legacy method)
      */
     public function customer()
     {

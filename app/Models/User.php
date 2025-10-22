@@ -138,9 +138,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Get motor logs for this customer
+     * Get motor logs for this customer (new relationship using user_id)
      */
     public function motorLogs()
+    {
+        return $this->hasMany(MotorLog::class);
+    }
+
+    /**
+     * Get motor logs for this customer (legacy relationship using phone_number)
+     */
+    public function motorLogsByPhone()
     {
         return $this->hasMany(MotorLog::class, 'phone_number', 'phone_number');
     }

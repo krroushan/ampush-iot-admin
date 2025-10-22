@@ -112,23 +112,28 @@
                         <flux:label for="search">Customer Phone</flux:label>
                         <flux:input 
                             type="text" 
-                            name="search" 
-                            id="search" 
-                            value="{{ request('search') }}" 
+                            name="phone_number" 
+                            id="phone_number" 
+                            value="{{ request('phone_number') }}" 
                             placeholder="Enter customer phone number"
-                            oninput="clearPhoneFilterAndFilter()"
+                            oninput="realTimeFilter()"
                         />
                     </div>
 
                     <!-- Select Phone Number -->
                     <div>
                         <flux:label for="phone_filter">Select Phone</flux:label>
-                        <flux:select name="phone_filter" id="phone_filter" onchange="clearSearchInputAndFilter()">
-                            <option value="">All Phone Numbers</option>
+                        <flux:select name="customer_id" id="customer_id" onchange="realTimeFilter()">
+                            <option value="">All Customers</option>
                             @foreach($phoneNumbers as $phoneNumber)
-                                <option value="{{ $phoneNumber }}" {{ request('phone_filter') == $phoneNumber ? 'selected' : '' }}>
-                                    {{ $phoneNumber }}
-                                </option>
+                                @php
+                                    $customer = \App\Models\User::where('phone_number', $phoneNumber)->where('role', 'customer')->first();
+                                @endphp
+                                @if($customer)
+                                    <option value="{{ $customer->id }}" {{ request('customer_id') == $customer->id ? 'selected' : '' }}>
+                                        {{ $customer->name }} ({{ $phoneNumber }})
+                                    </option>
+                                @endif
                             @endforeach
                         </flux:select>
                     </div>
@@ -136,7 +141,7 @@
                     <!-- Command -->
                     <div class="flex-1 min-w-[150px]">
                         <flux:label for="command">Command</flux:label>
-                        <flux:select name="command" id="command" onchange="submitFilterForm()">
+                        <flux:select name="command" id="command" onchange="realTimeFilter()">
                             <option value="">All Commands</option>
                             <option value="MOTORON" {{ request('command') == 'MOTORON' ? 'selected' : '' }}>MOTORON</option>
                             <option value="MOTOROFF" {{ request('command') == 'MOTOROFF' ? 'selected' : '' }}>MOTOROFF</option>
@@ -144,9 +149,22 @@
                         </flux:select>
                     </div>
 
+                    <!-- Device Filter -->
+                    <div class="flex-1 min-w-[150px]">
+                        <flux:label for="device_id">Device</flux:label>
+                        <flux:select name="device_id" id="device_id" onchange="realTimeFilter()">
+                            <option value="">All Devices</option>
+                            @foreach($devices as $device)
+                                <option value="{{ $device->id }}" {{ request('device_id') == $device->id ? 'selected' : '' }}>
+                                    {{ $device->device_name }} ({{ $device->sms_number }})
+                                </option>
+                            @endforeach
+                        </flux:select>
+                    </div>
+
                     <!-- Action Buttons -->
                     <div class="flex gap-2 sm:col-span-2 lg:col-span-1">
-                        <flux:button variant="outline" :href="route('motor-logs.index')">
+                        <flux:button variant="outline" onclick="clearFilters()" type="button">
                             Clear
                         </flux:button>
                         <flux:button type="submit" variant="primary">
@@ -165,7 +183,7 @@
                             name="date_from"
                             id="date_from"
                             value="{{ request('date_from') }}"
-                            onchange="submitFilterForm()"
+                            onchange="realTimeFilter()"
                         />
                     </div>
 
@@ -177,7 +195,7 @@
                             name="date_to"
                             id="date_to"
                             value="{{ request('date_to') }}"
-                            onchange="submitFilterForm()"
+                            onchange="realTimeFilter()"
                         />
                     </div>
                 </div>
@@ -200,7 +218,7 @@
                 </div>
 
                 @if($motorLogs->count() > 0)
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto" id="logsTable">
                         <table class="w-full min-w-[800px]">
                             <thead class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
                                 <tr>
@@ -210,6 +228,8 @@
                                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">ID</th>
                                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Timestamp</th>
                                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Phone</th>
+                                    <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Device</th>
+                                    <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Customer</th>
                                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Motor Status</th>
                                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Command</th>
                                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Voltage</th>
@@ -234,6 +254,22 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             {{ $log->phone_number }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+                                            @if($log->device)
+                                                <div class="font-medium">{{ $log->device->device_name }}</div>
+                                                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $log->device->sms_number }}</div>
+                                            @else
+                                                <span class="text-zinc-400">No device</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
+                                            @if($log->user)
+                                                <div class="font-medium">{{ $log->user->name }}</div>
+                                                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $log->user->email }}</div>
+                                            @else
+                                                <span class="text-zinc-400">No customer</span>
+                                            @endif
                                         </td>
                                         <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-zinc-900 dark:text-zinc-100">
                                             @if($log->motor_status == 'ON')
@@ -366,7 +402,7 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div class="mt-4">
+                    <div class="mt-4" id="paginationContainer">
                         {{ $motorLogs->links() }}
                     </div>
                 @else
@@ -427,48 +463,22 @@
             }
         }
 
-        // Debounce function to limit API calls
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
+        // Real-time filtering - simple and fast
+        let filterTimeout;
+        
+        function realTimeFilter() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                // Just submit the form - let Laravel handle the filtering
+                document.getElementById('filterForm').submit();
+            }, 500); // 500ms delay for typing
         }
-
-        // Real-time filter submission
-        const submitFilterForm = debounce(() => {
-            document.getElementById('filterForm').submit();
-        }, 300);
-
-        // Function to clear search input when phone filter is selected and filter
-        function clearSearchInputAndFilter() {
-            const phoneFilter = document.getElementById('phone_filter');
-            const searchInput = document.getElementById('search');
-            
-            if (phoneFilter.value) {
-                searchInput.value = '';
-            }
-            
-            // Submit form immediately for dropdown changes
-            document.getElementById('filterForm').submit();
-        }
-
-        // Function to clear phone filter when search input is used and filter
-        function clearPhoneFilterAndFilter() {
-            const searchInput = document.getElementById('search');
-            const phoneFilter = document.getElementById('phone_filter');
-            
-            if (searchInput.value) {
-                phoneFilter.value = '';
-            }
-            
-            // Use debounced submission for text input
-            submitFilterForm();
+        
+        // Clear filters
+        function clearFilters() {
+            console.log('Clearing filters...');
+            // Redirect to clean URL without any parameters
+            window.location.href = '{{ route("motor-logs.index") }}';
         }
     </script>
 </x-layouts.app>
