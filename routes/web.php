@@ -33,6 +33,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Customer Management Routes
     Route::resource('customers', \App\Http\Controllers\CustomerController::class);
     Route::get('customers/search', [\App\Http\Controllers\CustomerController::class, 'search'])->name('customers.search');
+    Route::post('customers/{customer}/assign-device', [\App\Http\Controllers\CustomerController::class, 'assignDevice'])->name('customers.assign-device');
 
     // Device Management Routes
     Route::resource('devices', \App\Http\Controllers\DeviceController::class);

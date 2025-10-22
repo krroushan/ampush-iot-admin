@@ -113,23 +113,13 @@
                 </div>
 
                 <!-- Form Actions -->
-                <div class="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-700">
-                    <form method="POST" action="{{ route('devices.destroy', $device) }}" onsubmit="return confirm('Are you sure you want to delete this device?');">
-                        @csrf
-                        @method('DELETE')
-                        <flux:button variant="danger" type="submit">
-                            Delete Device
-                        </flux:button>
-                    </form>
-
-                    <div class="flex items-center gap-4">
-                        <flux:button variant="ghost" :href="route('devices.index')" type="button">
-                            Cancel
-                        </flux:button>
-                        <flux:button variant="primary" type="submit">
-                            Update Device
-                        </flux:button>
-                    </div>
+                <div class="flex items-center justify-end gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+                    <flux:button variant="ghost" :href="route('devices.index')" type="button">
+                        Cancel
+                    </flux:button>
+                    <flux:button variant="primary" type="submit">
+                        Update Device
+                    </flux:button>
                 </div>
             </form>
         </div>

@@ -87,7 +87,17 @@ class CustomerController extends Controller
             abort(404);
         }
 
-        return view('customers.show', compact('customer'));
+        // Load customer's devices with counts
+        $customer->load('devices');
+        $totalDevices = $customer->devices->count();
+        $activeDevices = $customer->devices->where('is_active', true)->count();
+        
+        // Get last activity from devices
+        $lastActivity = $customer->devices()
+            ->whereNotNull('last_activity_at')
+            ->max('last_activity_at');
+
+        return view('customers.show', compact('customer', 'totalDevices', 'activeDevices', 'lastActivity'));
     }
 
     /**
@@ -207,6 +217,29 @@ class CustomerController extends Controller
             ->paginate(15);
 
         return view('customers.index', compact('customers'));
+    }
+
+    /**
+     * Assign device to customer
+     */
+    public function assignDevice(Request $request, User $customer)
+    {
+        // Ensure the user is a customer
+        if ($customer->role !== 'customer') {
+            abort(404);
+        }
+
+        $request->validate([
+            'device_id' => 'required|exists:devices,id'
+        ]);
+
+        $device = \App\Models\Device::findOrFail($request->device_id);
+        
+        // Assign device to customer
+        $device->update(['user_id' => $customer->id]);
+
+        return redirect()->route('customers.show', $customer)
+            ->with('success', 'Device assigned successfully.');
     }
 
 }
