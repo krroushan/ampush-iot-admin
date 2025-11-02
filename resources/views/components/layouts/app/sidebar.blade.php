@@ -17,6 +17,7 @@
                     <flux:navlist.item icon="users" :href="route('customers.index')" :current="request()->routeIs('customers.*')" wire:navigate>{{ __('Customers') }}</flux:navlist.item>
                     <flux:navlist.item icon="device-phone-mobile" :href="route('devices.index')" :current="request()->routeIs('devices.*')" wire:navigate>{{ __('Devices') }}</flux:navlist.item>
                     <flux:navlist.item icon="chart-bar" :href="route('motor-logs.index')" :current="request()->routeIs('motor-logs.*')" wire:navigate>{{ __('Motor Logs') }}</flux:navlist.item>
+                    <flux:navlist.item icon="document-chart-bar" :href="route('admin.reports.index')" :current="request()->routeIs('admin.reports.*')" wire:navigate>{{ __('Reports') }}</flux:navlist.item>
                     <flux:navlist.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate>{{ __('Notifications') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>

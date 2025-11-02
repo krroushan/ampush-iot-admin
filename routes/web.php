@@ -49,6 +49,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('notifications', [\App\Http\Controllers\Admin\NotificationWebController::class, 'index'])->name('notifications.index');
     Route::get('notifications/send', [\App\Http\Controllers\Admin\NotificationWebController::class, 'send'])->name('notifications.send');
     Route::post('notifications/send', [\App\Http\Controllers\Admin\NotificationWebController::class, 'store'])->name('notifications.store');
+
+    // Reports Routes
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('admin.reports.index');
 });
 
 require __DIR__.'/auth.php';
