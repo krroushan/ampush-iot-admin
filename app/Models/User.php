@@ -27,6 +27,8 @@ class User extends Authenticatable
         'role',
         'phone_number',
         'fcm_token',
+        'unit_price',
+        'motor_pumping_capacity',
         'address',
         'address_line_1',
         'address_line_2',
@@ -57,6 +59,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'unit_price' => 'decimal:2',
+            'motor_pumping_capacity' => 'integer',
         ];
     }
 

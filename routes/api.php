@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CustomerAuthController;
 use App\Http\Controllers\Api\MotorLogController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ReportsController;
 use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Admin\NotificationController;
@@ -124,6 +125,14 @@ Route::get('/validate-phone', function (Request $request) {
             'isRegistered' => false
         ], 404);
     }
+});
+
+// Motor Reports API Routes (Public - for mobile app)
+Route::prefix('reports')->group(function () {
+    Route::get('/daily', [ReportsController::class, 'daily']); // Daily report with hourly breakdown
+    Route::get('/monthly', [ReportsController::class, 'monthly']); // Monthly report with daily breakdown
+    Route::get('/yearly', [ReportsController::class, 'yearly']); // Yearly report with monthly breakdown
+    Route::get('/custom', [ReportsController::class, 'custom']); // Custom date range report
 });
 
 // Fallback route
