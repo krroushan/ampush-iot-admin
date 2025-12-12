@@ -342,4 +342,73 @@ class CustomerAuthController extends Controller
         }
     }
 
+    /**
+     * Delete Customer Account
+     * DELETE /api/customer/account
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string',
+            'confirmation' => 'required|string|in:DELETE MY ACCOUNT'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $customer = $request->user();
+
+            // Verify password
+            if (!Hash::check($request->password, $customer->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid password'
+                ], 401);
+            }
+
+            // Verify confirmation text
+            if ($request->confirmation !== 'DELETE MY ACCOUNT') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Confirmation text does not match'
+                ], 422);
+            }
+
+            // Revoke all tokens
+            $customer->tokens()->delete();
+
+            // Delete profile photo if exists
+            if ($customer->profile_photo && file_exists(public_path($customer->profile_photo))) {
+                unlink(public_path($customer->profile_photo));
+            }
+
+            // Unassign devices (set user_id to null)
+            \App\Models\Device::where('user_id', $customer->id)->update(['user_id' => null]);
+
+            // Delete notifications related to this user
+            \App\Models\Notification::where('user_id', $customer->id)->delete();
+
+            // Delete the customer account
+            $customer->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Account deleted successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete account',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

@@ -40,6 +40,9 @@ Route::middleware(['auth:sanctum', 'customer'])->prefix('customer')->group(funct
     
     // FCM token update
     Route::post('/fcm-token', [CustomerAuthController::class, 'updateFCMToken']);
+    
+    // Account deletion
+    Route::delete('/account', [CustomerAuthController::class, 'deleteAccount']);
 });
 
 // IoT Motor Logs API Routes (Public - for mobile app sync)

@@ -54,4 +54,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('reports', [\App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('admin.reports.index');
 });
 
+// Customer Account Deletion Routes (Public)
+Route::get('customer/delete-account', [\App\Http\Controllers\CustomerAccountController::class, 'showDeleteForm'])->name('customer.account.delete.form');
+Route::post('customer/delete-account', [\App\Http\Controllers\CustomerAccountController::class, 'deleteAccount'])->name('customer.account.delete');
+Route::get('customer/account-deleted', [\App\Http\Controllers\CustomerAccountController::class, 'deleted'])->name('customer.account.deleted');
+
+// Privacy Policy Route (Public)
+Route::get('privacy-policy', [\App\Http\Controllers\PrivacyPolicyController::class, 'index'])->name('privacy-policy');
+
 require __DIR__.'/auth.php';
