@@ -231,7 +231,7 @@
                 <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500 mt-4">
                     <p class="text-sm text-zinc-700 dark:text-zinc-300">
                         <strong class="text-zinc-900 dark:text-zinc-100">Quick Access:</strong> To delete your account immediately, visit: 
-                        <a href="https://laravel1.wizzyweb.com/customer/delete-account" class="text-blue-600 dark:text-blue-400 hover:underline font-medium break-all">https://laravel1.wizzyweb.com/customer/delete-account</a>
+                        <a href="https://iot.ampushworks.com/customer/delete-account" class="text-blue-600 dark:text-blue-400 hover:underline font-medium break-all">https://iot.ampushworks.com/customer/delete-account</a>
                     </p>
                 </div>
             </section>
@@ -350,11 +350,11 @@
                 <p class="text-zinc-700 dark:text-zinc-300 mb-4">
                     If you wish to delete your account and all associated data, you can do so at any time. This action is permanent and cannot be undone.
                 </p>
-                <a href="https://laravel1.wizzyweb.com/customer/delete-account" class="inline-block px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-200 font-medium">
+                <a href="https://iot.ampushworks.com/customer/delete-account" class="inline-block px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-200 font-medium">
                     Delete My Account
                 </a>
                 <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-3">
-                    Account Deletion URL: <a href="https://laravel1.wizzyweb.com/customer/delete-account" class="text-blue-600 dark:text-blue-400 hover:underline break-all">https://laravel1.wizzyweb.com/customer/delete-account</a>
+                    Account Deletion URL: <a href="https://iot.ampushworks.com/customer/delete-account" class="text-blue-600 dark:text-blue-400 hover:underline break-all">https://iot.ampushworks.com/customer/delete-account</a>
                 </p>
             </section>
 

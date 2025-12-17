@@ -1,6 +1,6 @@
 # Motor Reports API Documentation
 
-**Base URL:** `https://laravel1.wizzyweb.com/api`
+**Base URL:** `https://iot.ampushworks.com/api`
 
 Complete API reference for motor consumption reports with device-wise breakdown.
 
@@ -643,7 +643,7 @@ Each user has personalized settings:
 ## Quick Reference
 
 ```
-Base URL: https://laravel1.wizzyweb.com/api
+Base URL: https://iot.ampushworks.com/api
 
 Daily:     GET /reports/daily?user_id={id}&date={YYYY-MM-DD}
 Monthly:   GET /reports/monthly?user_id={id}&month={1-12}&year={YYYY}

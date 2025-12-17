@@ -4,19 +4,13 @@
 
 **Current Length: 45 characters**
 
-```
 Control and monitor IoT motors remotely via SMS commands
-```
 
 **Alternative Options:**
 
-```
 IoT motor control app with SMS-based remote operation
-```
 
-```
 Remote motor control using SMS for IoT devices
-```
 
 ---
 
@@ -24,7 +18,6 @@ Remote motor control using SMS for IoT devices
 
 **Current Length: 1,247 characters**
 
-```
 Ampush Motor Controller is an application for remotely controlling and monitoring IoT motor devices through SMS communication.
 
 FEATURES
@@ -102,7 +95,7 @@ Your privacy is important to us. The app includes:
 - Privacy policy access
 - Transparent data collection practices
 
-You can delete your account and all associated data at any time through the app settings or by visiting: https://laravel1.wizzyweb.com/customer/delete-account
+You can delete your account and all associated data at any time through the app settings or by visiting: https://iot.ampushworks.com/customer/delete-account
 
 COMPATIBILITY
 
@@ -116,7 +109,6 @@ Developed by AMPUSHWORKS ENTERPRISES PRIVATE LIMITED
 Address: Priyadarshi Nagar, Bhagwat Nagar, Bahadurpur, B.H.Colony, Sampatchak, Patna- 800026, Bihar, India
 
 For more information, visit https://ampushworks.com
-```
 
 ---
 

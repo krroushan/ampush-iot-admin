@@ -3,11 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Account Deleted - {{ config('app.name', 'Laravel') }}</title>
+    <title>Account Deleted - Ampush Motor Controller | AMPUSHWORKS ENTERPRISES PRIVATE LIMITED</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-zinc-50 dark:bg-zinc-900 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 text-center">
+        <!-- Company/App Branding Header -->
+        <div class="text-center border-b border-zinc-300 dark:border-zinc-700 pb-4">
+            <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+                Ampush Motor Controller
+            </h1>
+            <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                AMPUSHWORKS ENTERPRISES PRIVATE LIMITED
+            </p>
+        </div>
+
         <div>
             <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/20">
                 <svg class="h-8 w-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,6 +60,15 @@
         <div class="text-center">
             <p class="text-xs text-zinc-500 dark:text-zinc-400">
                 Thank you for using our service. If you have any questions, please contact support.
+            </p>
+        </div>
+
+        <!-- Company Footer -->
+        <div class="text-center border-t border-zinc-300 dark:border-zinc-700 pt-4 mt-6">
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                <strong class="text-zinc-700 dark:text-zinc-300">Ampush Motor Controller</strong><br>
+                Developed by <strong class="text-zinc-700 dark:text-zinc-300">AMPUSHWORKS ENTERPRISES PRIVATE LIMITED</strong><br>
+                <a href="https://ampushworks.com" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline text-xs">https://ampushworks.com</a>
             </p>
         </div>
     </div>

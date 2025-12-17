@@ -18,7 +18,7 @@ All Motor Reports APIs and Phone Validation API tested successfully on the live 
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/reports/daily?user_id=2&date=2025-10-23
+https://iot.ampushworks.com/api/reports/daily?user_id=2&date=2025-10-23
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 200)
@@ -79,7 +79,7 @@ https://laravel1.wizzyweb.com/api/reports/daily?user_id=2&date=2025-10-23
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/reports/monthly?user_id=2&month=10&year=2025
+https://iot.ampushworks.com/api/reports/monthly?user_id=2&month=10&year=2025
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 200)
@@ -130,7 +130,7 @@ https://laravel1.wizzyweb.com/api/reports/monthly?user_id=2&month=10&year=2025
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/reports/yearly?user_id=2&year=2025
+https://iot.ampushworks.com/api/reports/yearly?user_id=2&year=2025
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 200)
@@ -169,7 +169,7 @@ https://laravel1.wizzyweb.com/api/reports/yearly?user_id=2&year=2025
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/reports/custom?user_id=2&start_date=2025-10-01&end_date=2025-10-31
+https://iot.ampushworks.com/api/reports/custom?user_id=2&start_date=2025-10-01&end_date=2025-10-31
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 200)
@@ -210,7 +210,7 @@ https://laravel1.wizzyweb.com/api/reports/custom?user_id=2&start_date=2025-10-01
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/reports/daily?device_id=9&date=2025-10-23
+https://iot.ampushworks.com/api/reports/daily?device_id=9&date=2025-10-23
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 200)
@@ -254,7 +254,7 @@ https://laravel1.wizzyweb.com/api/reports/daily?device_id=9&date=2025-10-23
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/validate-phone?phone=9102318033
+https://iot.ampushworks.com/api/validate-phone?phone=9102318033
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 200)
@@ -276,7 +276,7 @@ https://laravel1.wizzyweb.com/api/validate-phone?phone=9102318033
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/validate-phone?phone=9999999999
+https://iot.ampushworks.com/api/validate-phone?phone=9999999999
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 404)
@@ -298,7 +298,7 @@ https://laravel1.wizzyweb.com/api/validate-phone?phone=9999999999
 
 **Request:**
 ```bash
-https://laravel1.wizzyweb.com/api/validate-phone
+https://iot.ampushworks.com/api/validate-phone
 ```
 
 **Response:** ✅ **SUCCESS** (HTTP 400)
@@ -366,7 +366,7 @@ https://laravel1.wizzyweb.com/api/validate-phone
 ### Example 1: Get Daily Report for User
 
 ```javascript
-const response = await fetch('https://laravel1.wizzyweb.com/api/reports/daily?user_id=2&date=2025-10-24');
+const response = await fetch('https://iot.ampushworks.com/api/reports/daily?user_id=2&date=2025-10-24');
 const data = await response.json();
 
 if (data.success) {
@@ -384,7 +384,7 @@ if (data.success) {
 
 ```javascript
 const validatePhone = async (phoneNumber) => {
-  const response = await fetch(`https://laravel1.wizzyweb.com/api/validate-phone?phone=${phoneNumber}`);
+  const response = await fetch(`https://iot.ampushworks.com/api/validate-phone?phone=${phoneNumber}`);
   const data = await response.json();
   
   if (data.isRegistered) {
@@ -401,7 +401,7 @@ const validatePhone = async (phoneNumber) => {
 ### Example 3: Get Specific Device Report
 
 ```javascript
-const response = await fetch('https://laravel1.wizzyweb.com/api/reports/daily?device_id=9&date=2025-10-24');
+const response = await fetch('https://iot.ampushworks.com/api/reports/daily?device_id=9&date=2025-10-24');
 const data = await response.json();
 
 if (data.success) {
@@ -463,7 +463,7 @@ All Motor Reports APIs and Phone Validation API are:
 - ✅ **Returning correct data**
 - ✅ **Ready for mobile app integration**
 
-**Base URL:** https://laravel1.wizzyweb.com/api
+**Base URL:** https://iot.ampushworks.com/api
 
 **Mobile app developers can now integrate these APIs! 🚀**
 
